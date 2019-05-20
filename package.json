@@ -1,0 +1,21 @@
+{
+  "name": "diploma",
+  "version": "1.0.0",
+  "description": "Sending microphone inputs to Arduino with help of Watson speech to text API",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "Matic Klemencic",
+  "license": "ISC",
+  "dependencies": {
+    "bower": "^1.8.8",
+    "express": "^4.17.0",
+    "firmata": "^2.0.0",
+    "ibm-watson": "^4.1.1",
+    "socket.io": "^2.2.0",
+    "watson-speech": "^0.35.11"
+  },
+  "devDependencies": {}
+}

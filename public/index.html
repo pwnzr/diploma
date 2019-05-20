@@ -1,0 +1,235 @@
+    
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Watson Speech to Text - Matic Klemenčič</title>
+	<link rel="stylesheet" href="style.css" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<script src="bower_components/watson-speech/dist/watson-speech.js"></script>
+	<!-- window.fetch pollyfill for IE/Edge & Older Chrome/FireFox -->
+	<script src="bower_components/fetch/fetch.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="bower_components/jquery/dist/jquery.min.js"></script>
+</head>
+<body> 
+<div class='container'>
+<div id="speech"> Speech input </div>
+        <button class ='mv_buttons' id="leftforward" >Lfwd</button>
+        <button class ='mv_buttons middle_btn' id="forward" >FWD</button>
+        <button class ='mv_buttons' id="rightforward" >Rfwd</button>
+        <button class ='mv_buttons' id="spinleft" >SpinL</button>
+        <button class ='mv_buttons middle_btn' id="stop" >STOP</button>
+        <button class ='mv_buttons' id="spinright" >SpinR</button>
+        <button class ='mv_buttons' id="leftbackward" >Lbkw</button>
+        <button class ='mv_buttons middle_btn' id="backward" >BKW</button>
+        <button class ='mv_buttons' id="rightbackward" >Rbkw</button>
+<div class="right">
+	<button id="start_button">Start</button>
+	<button id="stop_stream">Stop</button>
+</div>
+<div id="results">
+  <span id="final_span"></span>
+  <span id="interim_span"></span>
+</div>
+<div id="izpis"> </div>
+
+</div>
+
+<script>
+	 var socket = io().connect('192.168.77.130:8080');
+	socket.on('hello', function (data){
+		console.log(data + "toooo");
+	});
+
+	var output    = document.getElementById('izpis')
+	, buttonOn  = document.getElementById('buttonOn') // dodamo spremenljivko za gumb On ... t.j. poskrbimo, da je html ločen od javascript kode (če imamo browser, ki ne podpira JavaScript-a - unobtrusive JS)
+	, buttonOff = document.getElementById('buttonOff') // dodamo spremenljivko za gumb Off
+	, buttonZgrabi = document.getElementById('zgrabi') // dodamo spremenljivko za gumb Off; // dodamo spremenljivko za gumb Off
+	, buttonLedWhite = document.getElementById('ledwhite') // dodamo spremenljivko za gumb Off; // dodamo spremenljivko za gumb Off
+	, buttonLedYellow = document.getElementById('ledyellow') // dodamo spremenljivko za gumb Off; // dodamo spremenljivko za gumb Off
+	, buttonLedBlue = document.getElementById('ledblue') // dodamo spremenljivko za gumb Off; // dodamo spremenljivko za gumb Off
+	, buttonLedGreen = document.getElementById('ledgreen') // dodamo spremenljivko za gumb Off; // dodamo spremenljivko za gumb Off
+	, buttonLedRed = document.getElementById('ledred') // dodamo spremenljivko za gumb Off; // dodamo spremenljivko za gumb Off
+	, buttonLedsOff = document.getElementById('ledsoff') // dodamo spremenljivko za gumb Off; // dodamo spremenljivko za gumb Off
+	, buttonForward = document.getElementById('forward') // dodamo spremenljivko za gumb Off; // dodamo spremenljivko za gumb Off
+	, buttonBackward = document.getElementById('backward') // dodamo spremenljivko za gumb Off; // dodamo spremenljivko za gumb Off
+	, buttonStop = document.getElementById('stop') // dodamo spremenljivko za gumb Off; // dodamo spremenljivko za gumb Off
+	, buttonLeftforward = document.getElementById("leftforward")
+	, buttonRightforward = document.getElementById("rightforward")
+	, buttonSpinleft = document.getElementById("spinleft")
+	, buttonSpinright = document.getElementById("spinright")
+	, buttonLeftbackward = document.getElementById("leftbackward")	
+	, buttonRightbackward = document.getElementById("rightbackward")
+	, buttonTiltup = document.getElementById("tiltup")
+	, buttonTiltdown = document.getElementById("tiltdown");
+
+	function clearAllButtonBorders () { // funkcija postavi ozadja gumbov na izhodiščno vrednost
+	    buttonForward.style.background = "";
+	    buttonBackward.style.background = "";
+	    buttonStop.style.background = "";
+	    buttonLeftforward.style.background = "";
+	    buttonRightforward.style.background = "";
+	    buttonSpinleft.style.background = "";
+	    buttonSpinright.style.background = "";
+	    buttonLeftbackward.style.background = "";
+	    buttonRightbackward.style.background = "";
+	};        
+
+
+	function premakni(vrednost) {
+		if (vrednost == 1)
+			{socket.emit("ukazArduinu", {"stevilkaUkaza": 777});} // naprej
+		else if (vrednost == 10)
+			{socket.emit("ukazArduinu", {"stevilkaUkaza": 888});} // nazaj
+		else if (vrednost == 20)
+			{socket.emit("ukazArduinu", {"stevilkaUkaza": 999});} // stop
+	}
+	   
+	buttonForward.addEventListener('click', function() {
+        	socket.emit("ukazArduinu", {"stevilkaUkaza": 8});
+        });
+
+        buttonBackward.addEventListener('click', function() {
+    		socket.emit("ukazArduinu", {"stevilkaUkaza": 2});
+        });
+
+        buttonStop.addEventListener('click', function() {
+    		socket.emit("ukazArduinu", {"stevilkaUkaza": 5});
+        });
+
+        buttonLeftforward.addEventListener('click', function() {
+     		socket.emit("ukazArduinu", {"stevilkaUkaza": 7771});
+            });
+        buttonRightforward.addEventListener('click', function() {
+     		socket.emit("ukazArduinu", {"stevilkaUkaza": 7772});
+        });
+        buttonSpinleft.addEventListener('click', function() {
+     		socket.emit("ukazArduinu", {"stevilkaUkaza": 4});
+        });
+        buttonSpinright.addEventListener('click', function() {
+		socket.emit("ukazArduinu", {"stevilkaUkaza": 6});
+        });
+        buttonLeftbackward.addEventListener('click', function() {
+     		socket.emit("ukazArduinu", {"stevilkaUkaza": 8881});
+        });	
+        buttonRightbackward.addEventListener('click', function() {
+     		socket.emit("ukazArduinu", {"stevilkaUkaza": 8882});
+        });
+
+	// *****************************************************************************
+	// Koda za speech API ZAČETEK
+	// *****************************************************************************
+
+	
+  document.querySelector('#start_button').onclick = function () {
+
+    var $output = $('#speech').html('');
+
+    fetch('/api/speech-to-text/token')
+      .then(function(response) {
+        return response.text();
+      }).then(function (token) {
+
+        var stream = WatsonSpeech.SpeechToText.recognizeMicrophone({
+          token: token, // use `access_token` as the parameter name if using an RC service
+          objectMode: true,
+          format: false,
+          word_confidence: true
+        });
+
+        stream.on('error', function(err) {
+          console.log(err);
+        });
+
+        // each result (sentence) gets it's own <span> because Watson will sometimes go back and change a word as it hears more context
+        var $curSentence = $('<span class="interim">&nbsp;</span>').appendTo($output);
+
+        // a result is approximately equivalent to a sentence, and is the granularity that alternatives are selected on
+        stream.on('data', function(msg) {
+
+          if (msg.results) {
+              msg.results.forEach(function(result) {
+                // only final results include word confidence
+                if (result.final) {
+                  var html = result.alternatives[0].word_confidence.map(function(pair) {
+                      // the word_confidence array includes a sub-array for wach word like so: ['word', 0.9]
+                      // the score is a range from 1 (100% confident) to 0 (not at all confident)
+                      // RGB color values go on a scale of 0-255 with 0,0,0 being black and 255,255,255 being white.
+                      // In this case, we want confident words to be 0 (black), and the least confident words to be 200 (light grey)
+                      var shade = 200 - Math.round(pair[1] * 200);
+                      return pair[0];
+                    }).join(' ');
+
+                  $curSentence.html(html);
+                // *********************************************************************
+		// STOP = 5
+		// *********************************************************************    
+                if(html == 'stop'){
+		    	var stevilkaUkaza = 5;
+            		socket.emit("ukazArduinu", {"stevilkaUkaza": stevilkaUkaza});
+		    };
+		// *********************************************************************
+		// Naprej = 8
+		// *********************************************************************
+		if(html == "go") // ker napravimo premor med govorom moramo upoštevati tudi presledek+1, t.j. " 1"
+		{
+		    var stevilkaUkaza = 8;
+            		socket.emit("ukazArduinu", {"stevilkaUkaza": stevilkaUkaza});
+		    };	
+
+		    // *********************************************************************
+		// Nazaj = 2
+		// *********************************************************************
+		if(html == "back" || html == "beck"){
+		    	var stevilkaUkaza = 2;
+            		socket.emit("ukazArduinu", {"stevilkaUkaza": stevilkaUkaza});
+		};
+  		// *********************************************************************
+		// Levo = 4
+		// *********************************************************************
+		if(html == "left" || html == "let") {
+		    	var stevilkaUkaza = 4;
+            		socket.emit("ukazArduinu", {"stevilkaUkaza": stevilkaUkaza});
+		};
+		// *********************************************************************
+		// Desno = 6
+		// *********************************************************************
+		if(html == "right") {
+		    	var stevilkaUkaza = 6;
+            		socket.emit("ukazArduinu", {"stevilkaUkaza": stevilkaUkaza});
+		};
+		
+                  $curSentence.removeClass('interim').addClass('final');
+                  // if we have the final text for that sentence, start a new one
+
+		/////KONEC ARDUINA
+                } else {
+                  // for interim results
+                  $curSentence.html(result.alternatives[0].transcript);
+                }
+              });
+          }
+
+        });
+
+        document.querySelector('#stop_stream').onclick = stream.stop.bind(stream);
+
+      }).catch(function(error) {
+        console.log(error);
+      });
+  };
+
+	function ReplaceContentInContainer(id,content) { // za zamenjavo vsebine div-a
+	    var container = document.getElementById(id);
+	    container.innerHTML = content;
+	}
+	// *****************************************************************************
+	//Konec kode za speach API
+	// *****************************************************************************
+</script>
+
+</body>
+</html>
