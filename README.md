@@ -10,4 +10,5 @@ Postopek konfiguracije:
 4. Register to https://cloud.ibm.com/ create Speech to text service, region must be London!!!
 5. Copy credentials from dashboard https://cloud.ibm.com/ -> services -> show credentials -> copy them
 6. run command --> nano .env //modify .env file insert Speech to text IAM api key and url from https://cloud.ibm.com/ 
-7. run command --> sudo node server.js
+7. Modify ip in file /public/index.html on line --> var socket = io().connect('192.168.77.130:8080')
+8. run command --> sudo node server.js
