@@ -15,7 +15,8 @@
     "firmata": "^2.0.0",
     "ibm-watson": "^4.1.1",
     "socket.io": "^2.2.0",
-    "watson-speech": "^0.35.11"
+    "watson-speech": "^0.35.11",
+    "ip": "^1.1.5"
   },
   "devDependencies": {}
 }
