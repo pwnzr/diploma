@@ -40,9 +40,6 @@
 
 <script>
 	 var socket = io().connect('192.168.77.130:8080');
-	socket.on('hello', function (data){
-		console.log(data + "toooo");
-	});
 
 	var output    = document.getElementById('izpis')
 	, buttonOn  = document.getElementById('buttonOn') // dodamo spremenljivko za gumb On ... t.j. poskrbimo, da je html ločen od javascript kode (če imamo browser, ki ne podpira JavaScript-a - unobtrusive JS)
