@@ -79,9 +79,6 @@ var board = new firmata.Board("/dev/ttyUSB0",function(){
 
 });
 
-io.on('connection', function(socket) {
-	socket.emit('hello', 'can you here me?');
-});
 
 io.on('connection', function(socket){
 	socket.on("ukazArduinu", function(data){
