@@ -16,65 +16,59 @@
 </head>
 <body> 
 <div class='container'>
-<div id="speech"> Speech input </div>
-        <button class ='mv_buttons' id="leftforward" >Lfwd</button>
-        <button class ='mv_buttons middle_btn' id="forward" >FWD</button>
-        <button class ='mv_buttons' id="rightforward" >Rfwd</button>
-        <button class ='mv_buttons' id="spinleft" >SpinL</button>
-        <button class ='mv_buttons middle_btn' id="stop" >STOP</button>
-        <button class ='mv_buttons' id="spinright" >SpinR</button>
-        <button class ='mv_buttons' id="leftbackward" >Lbkw</button>
-        <button class ='mv_buttons middle_btn' id="backward" >BKW</button>
-        <button class ='mv_buttons' id="rightbackward" >Rbkw</button>
-<div class="right">
-	<button id="start_button">Start</button>
-	<button id="stop_stream">Stop</button>
+	<div class='inner_container watson'>
+		<h2> Watson API </h2>
+		<div id="speech" class='speech_output'> Watson speech input </div>
+		<div class="right">
+			<button id="watson_start_button">Start</button>
+			<button id="watson_stop_stream">Stop</button>
+		</div>
+	</div>
+	<div class='inner_container google'>
+		<h2> Google API </h2>
+		<div id="google_speech" class='speech_output'> Google speech input </div>
+		<div class="right">
+			<button id="google_start" onclick='startButton(event)'>Start</button>
+			<button id="google_stop" onclick='stopButton()'>Stop</button>
+		</div>
+	</div>
 </div>
-<div id="results">
-  <span id="final_span"></span>
-  <span id="interim_span"></span>
-</div>
-<div id="izpis"> </div>
-
+<br>
+<div class='output_tables container'>
+	<div id='watson_output_table'>
+		<table id='wat_tab'>
+			<thead>
+				<tr>
+					<th colspan='3'>Watson words output</th>
+				</tr>
+				<tr>
+					<th>Word</th>
+					<th>Word Confidence</th>
+					<th>Time from input to arduino</th>
+				</tr>
+			</thead>
+		</table>
+	</div>
+	<br>
+	<div id='google_output_table'>
+			<table id='goog_tab'>
+			<thead>
+				<tr>
+					<th colspan='3'>Google words output</th>
+				</tr>
+				<tr>
+					<th>Word</th>
+					<th>Word Confidence</th>
+					<th>Time from input to arduino</th>
+				</tr>
+			</thead>
+		</table>
+	</div>
 </div>
 
 <script>
 	 var socket = io().connect('192.168.77.130:8080');
-
-	var output    = document.getElementById('izpis')
-	, buttonOn  = document.getElementById('buttonOn') // dodamo spremenljivko za gumb On ... t.j. poskrbimo, da je html ločen od javascript kode (če imamo browser, ki ne podpira JavaScript-a - unobtrusive JS)
-	, buttonOff = document.getElementById('buttonOff') // dodamo spremenljivko za gumb Off
-	, buttonZgrabi = document.getElementById('zgrabi') // dodamo spremenljivko za gumb Off; // dodamo spremenljivko za gumb Off
-	, buttonLedWhite = document.getElementById('ledwhite') // dodamo spremenljivko za gumb Off; // dodamo spremenljivko za gumb Off
-	, buttonLedYellow = document.getElementById('ledyellow') // dodamo spremenljivko za gumb Off; // dodamo spremenljivko za gumb Off
-	, buttonLedBlue = document.getElementById('ledblue') // dodamo spremenljivko za gumb Off; // dodamo spremenljivko za gumb Off
-	, buttonLedGreen = document.getElementById('ledgreen') // dodamo spremenljivko za gumb Off; // dodamo spremenljivko za gumb Off
-	, buttonLedRed = document.getElementById('ledred') // dodamo spremenljivko za gumb Off; // dodamo spremenljivko za gumb Off
-	, buttonLedsOff = document.getElementById('ledsoff') // dodamo spremenljivko za gumb Off; // dodamo spremenljivko za gumb Off
-	, buttonForward = document.getElementById('forward') // dodamo spremenljivko za gumb Off; // dodamo spremenljivko za gumb Off
-	, buttonBackward = document.getElementById('backward') // dodamo spremenljivko za gumb Off; // dodamo spremenljivko za gumb Off
-	, buttonStop = document.getElementById('stop') // dodamo spremenljivko za gumb Off; // dodamo spremenljivko za gumb Off
-	, buttonLeftforward = document.getElementById("leftforward")
-	, buttonRightforward = document.getElementById("rightforward")
-	, buttonSpinleft = document.getElementById("spinleft")
-	, buttonSpinright = document.getElementById("spinright")
-	, buttonLeftbackward = document.getElementById("leftbackward")	
-	, buttonRightbackward = document.getElementById("rightbackward")
-	, buttonTiltup = document.getElementById("tiltup")
-	, buttonTiltdown = document.getElementById("tiltdown");
-
-	function clearAllButtonBorders () { // funkcija postavi ozadja gumbov na izhodiščno vrednost
-	    buttonForward.style.background = "";
-	    buttonBackward.style.background = "";
-	    buttonStop.style.background = "";
-	    buttonLeftforward.style.background = "";
-	    buttonRightforward.style.background = "";
-	    buttonSpinleft.style.background = "";
-	    buttonSpinright.style.background = "";
-	    buttonLeftbackward.style.background = "";
-	    buttonRightbackward.style.background = "";
-	};        
-
+      
 
 	function premakni(vrednost) {
 		if (vrednost == 1)
@@ -85,44 +79,18 @@
 			{socket.emit("ukazArduinu", {"stevilkaUkaza": 999});} // stop
 	}
 	   
-	buttonForward.addEventListener('click', function() {
-        	socket.emit("ukazArduinu", {"stevilkaUkaza": 8});
-        });
 
-        buttonBackward.addEventListener('click', function() {
-    		socket.emit("ukazArduinu", {"stevilkaUkaza": 2});
-        });
-
-        buttonStop.addEventListener('click', function() {
-    		socket.emit("ukazArduinu", {"stevilkaUkaza": 5});
-        });
-
-        buttonLeftforward.addEventListener('click', function() {
-     		socket.emit("ukazArduinu", {"stevilkaUkaza": 7771});
-            });
-        buttonRightforward.addEventListener('click', function() {
-     		socket.emit("ukazArduinu", {"stevilkaUkaza": 7772});
-        });
-        buttonSpinleft.addEventListener('click', function() {
-     		socket.emit("ukazArduinu", {"stevilkaUkaza": 4});
-        });
-        buttonSpinright.addEventListener('click', function() {
-		socket.emit("ukazArduinu", {"stevilkaUkaza": 6});
-        });
-        buttonLeftbackward.addEventListener('click', function() {
-     		socket.emit("ukazArduinu", {"stevilkaUkaza": 8881});
-        });	
-        buttonRightbackward.addEventListener('click', function() {
-     		socket.emit("ukazArduinu", {"stevilkaUkaza": 8882});
-        });
 
 	// *****************************************************************************
-	// Koda za speech API ZAČETEK
+	// Koda za Watson speech API ZAČETEK
 	// *****************************************************************************
+var counter = 2;
 
+  document.querySelector('#watson_start_button').onclick = function () {
+	var wat_tab = document.getElementById('wat_tab');
+	wat_tab.style.visibility = ' visible';
+	var wat_timestap;
 	
-  document.querySelector('#start_button').onclick = function () {
-
     var $output = $('#speech').html('');
 
     fetch('/api/speech-to-text/token')
@@ -134,7 +102,7 @@
           token: token, // use `access_token` as the parameter name if using an RC service
           objectMode: true,
           format: false,
-          word_confidence: true
+          word_confidence: true,
         });
 
         stream.on('error', function(err) {
@@ -146,19 +114,27 @@
 
         // a result is approximately equivalent to a sentence, and is the granularity that alternatives are selected on
         stream.on('data', function(msg) {
-
-          if (msg.results) {
+			
+          if (msg.results) {	
               msg.results.forEach(function(result) {
                 // only final results include word confidence
                 if (result.final) {
+				var wat_start_timestap = Date.now();
                   var html = result.alternatives[0].word_confidence.map(function(pair) {
                       // the word_confidence array includes a sub-array for wach word like so: ['word', 0.9]
                       // the score is a range from 1 (100% confident) to 0 (not at all confident)
                       // RGB color values go on a scale of 0-255 with 0,0,0 being black and 255,255,255 being white.
                       // In this case, we want confident words to be 0 (black), and the least confident words to be 200 (light grey)
-                      var shade = 200 - Math.round(pair[1] * 200);
+                    //  var shade = 200 - Math.round(pair[1] * 200);
+					  	let newRow = wat_tab.insertRow(-1);
+						let newCell = newRow.insertCell(0);
+						let newCell0 = newRow.insertCell(1);
+						newCell.innerHTML = pair[0];
+						newCell0.innerHTML = pair[1];
                       return pair[0];
                     }).join(' ');
+
+					
 
                   $curSentence.html(html);
                 // *********************************************************************
@@ -167,6 +143,7 @@
                 if(html == 'stop'){
 		    	var stevilkaUkaza = 5;
             		socket.emit("ukazArduinu", {"stevilkaUkaza": stevilkaUkaza});
+					var wat_stop_timestap = Date.now();
 		    };
 		// *********************************************************************
 		// Naprej = 8
@@ -175,6 +152,7 @@
 		{
 		    var stevilkaUkaza = 8;
             		socket.emit("ukazArduinu", {"stevilkaUkaza": stevilkaUkaza});
+					var wat_stop_timestap = Date.now();
 		    };	
 
 		    // *********************************************************************
@@ -183,6 +161,7 @@
 		if(html == "back" || html == "beck"){
 		    	var stevilkaUkaza = 2;
             		socket.emit("ukazArduinu", {"stevilkaUkaza": stevilkaUkaza});
+					var wat_stop_timestap = Date.now();
 		};
   		// *********************************************************************
 		// Levo = 4
@@ -190,6 +169,7 @@
 		if(html == "left" || html == "let") {
 		    	var stevilkaUkaza = 4;
             		socket.emit("ukazArduinu", {"stevilkaUkaza": stevilkaUkaza});
+					var wat_stop_timestap = Date.now();
 		};
 		// *********************************************************************
 		// Desno = 6
@@ -197,12 +177,16 @@
 		if(html == "right") {
 		    	var stevilkaUkaza = 6;
             		socket.emit("ukazArduinu", {"stevilkaUkaza": stevilkaUkaza});
+					var wat_stop_timestap = Date.now();
 		};
-		
+		wat_timestap = (wat_stop_timestap - wat_start_timestap)/1000;
+		var wat_lat = wat_tab.rows[counter];
+		var x = wat_lat.insertCell(2);
+		x.innerHTML = wat_timestap;
+		counter++;
+	/////KONEC ARDUINA
                   $curSentence.removeClass('interim').addClass('final');
                   // if we have the final text for that sentence, start a new one
-
-		/////KONEC ARDUINA
                 } else {
                   // for interim results
                   $curSentence.html(result.alternatives[0].transcript);
@@ -212,20 +196,201 @@
 
         });
 
-        document.querySelector('#stop_stream').onclick = stream.stop.bind(stream);
-
+		document.querySelector('#watson_stop_stream').onclick = stream.stop.bind(stream);
       }).catch(function(error) {
         console.log(error);
       });
   };
 
+
+	// *****************************************************************************
+	//Konec kode za speach Watson API
+	// *****************************************************************************
+	// *****************************************************************************
+	// Koda za Google speech API ZAČETEK
+	// *****************************************************************************
+	
 	function ReplaceContentInContainer(id,content) { // za zamenjavo vsebine div-a
 	    var container = document.getElementById(id);
 	    container.innerHTML = content;
 	}
-	// *****************************************************************************
-	//Konec kode za speach API
-	// *****************************************************************************
+		/*var two_line = /\n\n/g;
+	var one_line = /\n/g;
+	function linebreak(s) {
+	  return s.replace(two_line, '<p></p>').replace(one_line, '<br>');
+	}*/
+var final_transcript = '';
+var count_row = 2;
+var recognizing = false;
+var ignore_onend;
+var start_timestamp;
+var transcript_confidence = 0;
+var goo_tab = document.getElementById('goog_tab');
+if (!('webkitSpeechRecognition' in window)) {
+  upgrade();
+} else {
+  var recognition = new webkitSpeechRecognition();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  
+
+  recognition.onstart = function() {
+    recognizing = true;
+    //document.getElementById("start_button").innerText = "Speak to Mic";
+  };
+
+  recognition.onerror = function(event) {
+    if (event.error == 'no-speech') {
+      //document.getElementById("start_button").innerText = "Start Microphone";
+      ignore_onend = true;
+    }
+    if (event.error == 'audio-capture') {
+      //document.getElementById("start_button").innerText = "Start Microphone";
+      ignore_onend = true;
+    }
+    if (event.error == 'not-allowed') {
+      if (event.timeStamp - start_timestamp < 100) {
+      } else {
+      }
+      ignore_onend = true;
+    }
+  };
+  
+
+var final_trs;
+
+  recognition.onresult = function(event) {
+      var interim_transcript = '';
+	var gog_start_timestap = Date.now();
+	
+    // interim_transcript += event.results[i][0].transcript;
+    for (var i = event.resultIndex; i < event.results.length; ++i) {
+      if (event.results[i].isFinal) {
+        final_transcript += event.results[i][0].transcript;
+        final_trs = event.results[i][0].transcript;
+		interim_transcript += event.results[i][0].transcript;
+		//tempx = event.results[i][0].transcript; 
+		//log(event.results[i][0].transcript);
+		transcript_confidence = event.results[i][0].confidence;
+		//Filling table with data
+		let newRow = goo_tab.insertRow(-1);
+		let newCell = newRow.insertCell(0);
+		let newCell0 = newRow.insertCell(1);
+		newCell.innerHTML = interim_transcript;
+		newCell0.innerHTML = transcript_confidence;
+		
+		console.log('Speech result:' + gog_start_timestap);
+		
+		
+		interim_transcript = interim_transcript.toLowerCase();
+	interim_transcript = interim_transcript.replace(/\s/g, '');
+	ReplaceContentInContainer("google_speech", interim_transcript);
+
+
+		// *********************************************************************
+		// STOP = 5
+		// *********************************************************************    
+		
+                if(interim_transcript == "break"  || interim_transcript == "stop" )
+		{
+		    var stevilkaUkaza = 5;
+            socket.emit("ukazArduinu", {"stevilkaUkaza": stevilkaUkaza});
+			var gog_stop_timestap = Date.now();
+		    };
+        // *********************************************************************
+		// Naprej = 8
+		// *********************************************************************
+		if(interim_transcript == "go") // ker napravimo premor med govorom moramo upoštevati tudi presledek+1, t.j. " 1"
+		{
+		    var stevilkaUkaza = 8;
+            socket.emit("ukazArduinu", {"stevilkaUkaza": stevilkaUkaza});
+			var gog_stop_timestap = Date.now();
+		    };
+        // *********************************************************************
+		// Nazaj = 2
+		// *********************************************************************
+		if(interim_transcript == "back") // ker napravimo premor med govorom moramo upoštevati tudi presledek+1, t.j. " 1"
+		{
+		    var stevilkaUkaza = 2;
+            socket.emit("ukazArduinu", {"stevilkaUkaza": stevilkaUkaza});
+			var gog_stop_timestap = Date.now();
+		    };
+        // *********************************************************************
+		// Levo = 4
+		// *********************************************************************
+		if(interim_transcript == "left" ) // ker napravimo premor med govorom moramo upoštevati tudi presledek+1, t.j. " 1"
+		{
+		    var stevilkaUkaza = 4;
+            socket.emit("ukazArduinu", {"stevilkaUkaza": stevilkaUkaza});
+			var gog_stop_timestap = Date.now();
+		    };
+        // *********************************************************************
+		// Desno = 6
+		// *********************************************************************
+		if(interim_transcript == "right" ) // ker napravimo premor med govorom moramo upoštevati tudi presledek+1, t.j. " 1"
+		{
+		    var stevilkaUkaza = 6;
+            socket.emit("ukazArduinu", {"stevilkaUkaza": stevilkaUkaza});
+			var gog_stop_timestap = Date.now();
+		    };
+        // *********************************************************************
+		// Engage = 111
+		// *********************************************************************
+	/*	if(interim_transcript == "engage" || interim_transcript == " engage") // ker napravimo premor med govorom moramo upoštevati tudi presledek+1, t.j. " 1"
+		{
+		    var stevilkaUkaza = 111;
+            socket.emit("ukazArduinu", {"stevilkaUkaza": stevilkaUkaza});
+			var gog_stop_timestap = Date.now();
+		    };
+        // *********************************************************************
+		// Disengage = 222
+		// *********************************************************************
+		if(interim_transcript == "disengage" || interim_transcript == " disengage") // ker napravimo premor med govorom moramo upoštevati tudi presledek+1, t.j. " 1"
+		{
+            clearAllButtonBorders();            
+		    var stevilkaUkaza = 222;
+            socket.emit("ukazArduinu", {"stevilkaUkaza": stevilkaUkaza});
+			var gog_stop_timestap = Date.now();
+		    };		    */
+		
+		
+		var gog_timestamp = (gog_stop_timestap - gog_start_timestap)/1000;
+		var newCell1 = newRow.insertCell(2);
+		newCell1.innerHTML = gog_timestamp;
+		
+      } else {
+        interim_transcript += event.results[i][0].transcript;
+		transcript_confidence += event.results[i][0].confidence;
+      }
+    } 
+    
+
+
+//recognition.stop();
+	count_row++;
+  }; // zaključek recognition.on.result
+}
+/*recognition.onsoundend  = function(){
+	var test1 = Date.now();
+	console.log("Speech end:" + test1);
+};*/
+function startButton(event) {
+  final_transcript = '';
+  //recognition.lang = "sr-RS"; // določimo jezik angleščina z ameriškim (angleškim) dialektom; za Српски -> "sr-RS"
+  recognition.lang = "en-US";
+  recognition.start();
+  ignore_onend = false;
+  start_timestamp = event.timeStamp;
+  var goo_tab = document.getElementById('goog_tab');
+	goo_tab.style.visibility = ' visible';
+}
+
+function stopButton(){
+  if (recognizing) {
+    recognition.stop();
+	document.getElementById('google_speech').innerText = 'Google speech input';
+	 }
+  }
 </script>
 
 </body>

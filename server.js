@@ -90,6 +90,7 @@ io.on('connection', function(socket){
                     board.digitalWrite(8, board.LOW); // na pinu 13 zapišemo vrednost LOW - LED indikator - modra
                     setTimeout(function() {board.servoWrite(11,93 );},0); // stop levi motor
                     setTimeout(function() {board.servoWrite(10,93 );},0); // stop desni motor
+			
                 }
                // *********************************************************************
 		       // Naprej

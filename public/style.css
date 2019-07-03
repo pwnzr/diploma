@@ -1,5 +1,8 @@
 body { font-family: courier; font-size: 12px; }
-.container {max-width:510px;}
-#speech{border-style:dotted;border-color:#c3c3c3;padding:10px;font-size:24px;color:#00ff00;width:100%;text-align:center;box-sizing: border-box;-moz-box-sizing: border-box;-webkit-box-sizing: border-box;margin: 0 0 10px;}
-.mv_buttons{height: 162px;width: 33%;font-size: 35px;float: left;margin: 0 0 10px;}
-.middle_btn {margin: 0 0.5% 10px;} 
+.container {max-width:510px;text-align:center;}
+.speech_output{border: solid 5px #c3c3c3;padding:10px;font-size:24px;color:red;width:100%;text-align:center;box-sizing: border-box;-moz-box-sizing: border-box;-webkit-box-sizing: border-box;margin: 0 0 10px;}
+h2{font-size:30px;}
+table, th, td {border: 1px solid black;border-collapse: collapse;}
+table {visibility: hidden;width:100%;}
+th,td{width: 33%;}
+
