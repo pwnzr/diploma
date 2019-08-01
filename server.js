@@ -5,8 +5,26 @@ const SpeechToTextV1 = require('ibm-watson/speech-to-text/v1');
 const vcapServices = require('vcap_services');
 const firmata = require('firmata');
 var ip = require("ip");
+/*var hark = require('./hark.js');
+var getUserMedia = require('getusermedia');
 
-
+ navigator.mediaDevices.getUserMedia({audio:true}).then(
+	 function(err, stream) {
+		if (err) {
+			console.log(err); 
+			}
+	 
+		var options = {};
+		var speechEvents = hark(stream, options);
+	 
+		speechEvents.on('speaking', function() {
+		  console.log('speaking');
+		});
+	 
+		speechEvents.on('stopped_speaking', function() {
+		  console.log('stopped_speaking');
+		});
+  });*/
 
 // allows environment properties to be set in a file named .env
 require('dotenv').load({ silent: true });
@@ -62,23 +80,42 @@ var io = require('socket.io').listen(server);
 
 //Priključitev na arduino
 var board = new firmata.Board("/dev/ttyUSB0",function(){
-    	console.log("Priključitev na Arduino");
-        console.log("Firmware: " + board.firmware.name + "-" + board.firmware.version.major + "." + 		board.firmware.version.minor); // izpišemo verzijo Firmware     
-        board.pinMode(9, board.MODES.SERVO);        
+	console.log("Priključitev na Arduino");
+    console.log("Firmware: " + board.firmware.name + "-" + board.firmware.version.major + "." + 		board.firmware.version.minor); // izpišemo verzijo Firmware     
+    board.pinMode(9, board.MODES.SERVO);        
 	board.pinMode(10, board.MODES.SERVO);
 	board.pinMode(11, board.MODES.SERVO); 
 	board.pinMode(13, board.MODES.OUTPUT);
-    	board.pinMode(12, board.MODES.OUTPUT);
+    board.pinMode(12, board.MODES.OUTPUT);
    	board.pinMode(8, board.MODES.OUTPUT);
-    	board.pinMode(7, board.MODES.OUTPUT);
-    	board.pinMode(4, board.MODES.OUTPUT);
+    board.pinMode(7, board.MODES.OUTPUT);
+    board.pinMode(4, board.MODES.OUTPUT);
  	board.pinMode(6, board.MODES.SERVO);
 	board.pinMode(2, board.MODES.OUTPUT);
-	console.log("Omogočeni pin-i: 2,4,6,7,8,9,10,11,12,13.");
+	board.pinMode(0, board.MODES.ANALOG); // declare analog pin 0
+	console.log("Omogočeni pin-i: 0,2,4,6,7,8,9,10,11,12,13.");
 
 
 });
 
+board.on("ready", function() {
+    
+    board.analogRead(0, function(value){
+        desiredValue = value; // continuous read of pin A0
+    });
+	
+	io.on("connection", function(socket) {
+        setInterval(sendValues, 40, socket); // each 40ms send val
+    }); // end of sockets.on connection
+
+}); // end of board.on ready
+
+function sendValues (socket) {
+    socket.emit("clientReadValues",
+    {
+    "desiredValue": desiredValue
+    });
+};
 
 io.on('connection', function(socket){
 	socket.on("ukazArduinu", function(data){

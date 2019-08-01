@@ -13,10 +13,11 @@
     "bower": "^1.8.8",
     "express": "^4.17.0",
     "firmata": "^2.0.0",
+    "getusermedia": "^2.0.1",
     "ibm-watson": "^4.1.1",
+    "ip": "^1.1.5",
     "socket.io": "^2.2.0",
-    "watson-speech": "^0.35.11",
-    "ip": "^1.1.5"
+    "watson-speech": "^0.35.11"
   },
   "devDependencies": {}
 }

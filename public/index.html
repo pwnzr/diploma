@@ -13,9 +13,13 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
 	<script src="/socket.io/socket.io.js"></script>
 	<script src="bower_components/jquery/dist/jquery.min.js"></script>
+	<script src="/hark.js"></script>
 </head>
-<body> 
+<body onload="load();"> 
 <div class='container'>
+<div>
+<canvas id="canvas1" width ="512" height = "300" style="border: 1px dashed #00c3c3;"></canvas>  
+</div>    
 	<div class='inner_container watson'>
 		<h2> Watson API </h2>
 		<div id="speech" class='speech_output'> Watson speech input </div>
@@ -65,22 +69,84 @@
 		</table>
 	</div>
 </div>
+<div id='canvas_output'>
 
+</div>
 <script>
-	 var socket = io().connect('192.168.77.130:8080');
-      
+	var stevec = 0;
+	var output = document.getElementById('canvas_output');
+	function log(msg) { // funkcija za izpis sporočil z izvedenim pomikom (scroll)
+      	var node=document.createElement("tr"); // ustvarimo spremenljivko node kot vrstico tabele za izpis
+      	var textnode=document.createTextNode(stevec + " | " + msg); // ustvarimo element s tekstom (vrednost stanja)
+      	node.appendChild(textnode); // dodamo izpis k "node" t.j. vrstici tabele
+  		output.insertBefore(node,output.childNodes[0]); // output je spremenljivka div-a t.j. output = document.getElementById("output")
+       /*if (stevec > 9) { // če je vrstic več kot 10 (šteti začnemo z 0)
+              output.removeChild(output.childNodes[10],output.childNodes[10]); // odstranimo najstarejši zapis
+  		}*/
+      	stevec = stevec + 1; // povečamo števec števila izpisanih sporočil
+  	}
 
-	function premakni(vrednost) {
-		if (vrednost == 1)
-			{socket.emit("ukazArduinu", {"stevilkaUkaza": 777});} // naprej
-		else if (vrednost == 10)
-			{socket.emit("ukazArduinu", {"stevilkaUkaza": 888});} // nazaj
-		else if (vrednost == 20)
-			{socket.emit("ukazArduinu", {"stevilkaUkaza": 999});} // stop
-	}
-	   
+		var potValue1 = 0; // value of the first potentiometer
+		var x1 = new Array(); // array for x1
+		var y1 = new Array(); // array for y1
+		var canvas1;
+		var ctx1;    
 
+		function load() { // function that is started, when we open the page
+			canvas1 = document.getElementById("canvas1");
+			ctx1 = canvas1.getContext("2d");
+			// initialization of graph with points
+			ctx1.lineWidth = "1";
+			ctx1.strokeStyle = "#ff0000";
+			
+			
+			// draw first time series initialization
+			for (var i=0; i<512; i++) {
+				x1[i] = i; // for x values are 0, 1, 2, ...
+				y1[i] = 0; // for y values are 0
+			};
+			ctx1.stroke();
+		};
+		
 
+		var constraints = { audio: true, video: false}; 
+	//var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+	window.stop_timestap;
+	navigator.mediaDevices.getUserMedia(constraints)
+	.then(function(stream){
+		var options = {};
+		var speechEvents = hark(stream, options);
+		speechEvents.on('speaking', function() {
+		start_timestap = Date.now();
+		});
+
+		speechEvents.on('stopped_speaking', function() {
+		stop_timestap =Date.now();
+		});
+	})
+	.catch(function(err) { console.log(err.name + ": " + err.message); }); // always check for errors at the end.
+	
+
+	 var socket = io().connect('192.168.0.104:8080');
+	 
+	 socket.on("clientReadValues", function(value) {
+		potValue1 = value.desiredValue;
+		// Draw graph *****************************************
+		ctx1.lineWidth = "1";
+		ctx1.strokeStyle = "#ff0000";
+		ctx1.clearRect(0, 0, canvas1.width, canvas1.height); // clear the canvas
+		ctx1.beginPath(); // to start drawing new line
+		y1.splice(0, 1); // on the position 0 in the field y1 we erase one value
+		y1[511] = potValue1; // new value is added at the end
+		for (var i=0; i<512; i++) {
+			ctx1.lineTo(x1[i], (300 - (y1[i] / 1023) * 300)); // 0,0 x,y coordinate is in upper left corner
+		};
+		ctx1.stroke(); // to draw the line
+		// End of draw graph***********************************
+		log(potValue1);
+		
+	});
+	 
 	// *****************************************************************************
 	// Koda za Watson speech API ZAČETEK
 	// *****************************************************************************
@@ -89,7 +155,6 @@ var counter = 2;
   document.querySelector('#watson_start_button').onclick = function () {
 	var wat_tab = document.getElementById('wat_tab');
 	wat_tab.style.visibility = ' visible';
-	var wat_timestap;
 	
     var $output = $('#speech').html('');
 
@@ -119,7 +184,6 @@ var counter = 2;
               msg.results.forEach(function(result) {
                 // only final results include word confidence
                 if (result.final) {
-				var wat_start_timestap = Date.now();
                   var html = result.alternatives[0].word_confidence.map(function(pair) {
                       // the word_confidence array includes a sub-array for wach word like so: ['word', 0.9]
                       // the score is a range from 1 (100% confident) to 0 (not at all confident)
@@ -135,7 +199,8 @@ var counter = 2;
                     }).join(' ');
 
 					
-
+					html = html.toLowerCase();
+					html = html.replace(/\s/g, '');
                   $curSentence.html(html);
                 // *********************************************************************
 		// STOP = 5
@@ -179,7 +244,7 @@ var counter = 2;
             		socket.emit("ukazArduinu", {"stevilkaUkaza": stevilkaUkaza});
 					var wat_stop_timestap = Date.now();
 		};
-		wat_timestap = (wat_stop_timestap - wat_start_timestap)/1000;
+		wat_timestap = (wat_stop_timestap - stop_timestap)/1000;
 		var wat_lat = wat_tab.rows[counter];
 		var x = wat_lat.insertCell(2);
 		x.innerHTML = wat_timestap;
@@ -261,7 +326,6 @@ var final_trs;
 
   recognition.onresult = function(event) {
       var interim_transcript = '';
-	var gog_start_timestap = Date.now();
 	
     // interim_transcript += event.results[i][0].transcript;
     for (var i = event.resultIndex; i < event.results.length; ++i) {
@@ -279,7 +343,6 @@ var final_trs;
 		newCell.innerHTML = interim_transcript;
 		newCell0.innerHTML = transcript_confidence;
 		
-		console.log('Speech result:' + gog_start_timestap);
 		
 		
 		interim_transcript = interim_transcript.toLowerCase();
@@ -309,7 +372,7 @@ var final_trs;
         // *********************************************************************
 		// Nazaj = 2
 		// *********************************************************************
-		if(interim_transcript == "back") // ker napravimo premor med govorom moramo upoštevati tudi presledek+1, t.j. " 1"
+		if(interim_transcript == "back" || interim_transcript == "beck") // ker napravimo premor med govorom moramo upoštevati tudi presledek+1, t.j. " 1"
 		{
 		    var stevilkaUkaza = 2;
             socket.emit("ukazArduinu", {"stevilkaUkaza": stevilkaUkaza});
@@ -352,12 +415,10 @@ var final_trs;
             socket.emit("ukazArduinu", {"stevilkaUkaza": stevilkaUkaza});
 			var gog_stop_timestap = Date.now();
 		    };		    */
-		
-		
-		var gog_timestamp = (gog_stop_timestap - gog_start_timestap)/1000;
+		var gog_timestamp = (gog_stop_timestap - stop_timestap)/1000;
 		var newCell1 = newRow.insertCell(2);
 		newCell1.innerHTML = gog_timestamp;
-		
+		//console.log('test' + stop_timestap);
       } else {
         interim_transcript += event.results[i][0].transcript;
 		transcript_confidence += event.results[i][0].confidence;
