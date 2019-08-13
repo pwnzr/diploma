@@ -75,16 +75,16 @@
 <script>
 	var stevec = 0;
 	var output = document.getElementById('canvas_output');
-	function log(msg) { // funkcija za izpis sporočil z izvedenim pomikom (scroll)
+	/*function log(msg) { // funkcija za izpis sporočil z izvedenim pomikom (scroll)
       	var node=document.createElement("tr"); // ustvarimo spremenljivko node kot vrstico tabele za izpis
       	var textnode=document.createTextNode(stevec + " | " + msg); // ustvarimo element s tekstom (vrednost stanja)
       	node.appendChild(textnode); // dodamo izpis k "node" t.j. vrstici tabele
   		output.insertBefore(node,output.childNodes[0]); // output je spremenljivka div-a t.j. output = document.getElementById("output")
-       /*if (stevec > 9) { // če je vrstic več kot 10 (šteti začnemo z 0)
+       if (stevec > 9) { // če je vrstic več kot 10 (šteti začnemo z 0)
               output.removeChild(output.childNodes[10],output.childNodes[10]); // odstranimo najstarejši zapis
-  		}*/
+  		}
       	stevec = stevec + 1; // povečamo števec števila izpisanih sporočil
-  	}
+  	}*/
 
 		var potValue1 = 0; // value of the first potentiometer
 		var x1 = new Array(); // array for x1
@@ -143,7 +143,7 @@
 		};
 		ctx1.stroke(); // to draw the line
 		// End of draw graph***********************************
-		log(potValue1);
+		//log(potValue1);
 		
 	});
 	 
@@ -396,6 +396,8 @@ var final_trs;
             socket.emit("ukazArduinu", {"stevilkaUkaza": stevilkaUkaza});
 			var gog_stop_timestap = Date.now();
 		    };
+
+		
         // *********************************************************************
 		// Engage = 111
 		// *********************************************************************
